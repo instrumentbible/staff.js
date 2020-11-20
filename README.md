@@ -17,7 +17,7 @@ import **staff.js** library
 <!-- import JavaScript -->
 <script src="js/JZZ.js"></script>
 <script src="js/JZZ.input.Kbd.js"></script>
-<script src="staff.js"></script>
+<script src="js/staff.js"></script>
 ```
 add this HTML 
 ```html
@@ -78,16 +78,10 @@ staff.getNote('myStaff');
 // 68
 ```	
 
-
-
-
-
 change the accidental
 ```javascript
 staff.setAccidental('sharp');
 ```	
-
-
 
 
 ### Chords
@@ -105,7 +99,7 @@ staff.setNote(chord);
 ## TO DO
  - support for multiple staffs
  - refactor ledger line code
- - create a addNote() function
+ - create a `addNote()` function
  - add way to make note color different from staff color
  - add key signatures
  - add microtonal notation
