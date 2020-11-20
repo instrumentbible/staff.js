@@ -1,16 +1,22 @@
 # staff.js 🎼
-![GitHub](https://img.shields.io/github/license/instrumentbible/staff.js)
 
 A javascript library for displaying notes on a musical staff.
+> DISCLAIMER: this library is a work in progress
 
 ## Features
 
- * Touch on staff to update the note
+* Touch on staff to update the note
  * Change accidental sharp or flat
 
 # Setup
 import **staff.js** library
 ```html
+<!-- import CSS -->
+<link rel="stylesheet" href="css/staff.css" />
+
+<!-- import JavaScript -->
+<script src="js/JZZ.js"></script>
+<script src="js/JZZ.input.Kbd.js"></script>
 <script src="staff.js"></script>
 ```
 add this HTML 
@@ -97,6 +103,10 @@ staff.setNote(chord);
 ```
 
 ## TO DO
+ - support for multiple staffs
+ - refactor ledger line code
+ - create a addNote() function
+ - add way to make note color different from staff color
  - add key signatures
  - add microtonal notation
  - add way to change note stems

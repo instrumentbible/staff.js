@@ -13,13 +13,12 @@
 /* ========== Staff ========== */
 #staffDiv{max-height: 100vh;margin: 0 auto;text-align: center;/* height: 100%; */margin: 0 !important; width: 100% !important; border-radius: 5px!important;}
 #svgStaff {box-sizing: border-box; min-height:100%; max-width: 100%; height: -webkit-fill-available; cursor:pointer !important; }
-#noteGroup path, #noteGroup g,#noteGroup{  pointer-events: none}
-#note{font-size: 110px;}
-.note{font-size: 110px;}
-#noteGroup text{font-size: 110px;}
+.noteGroup path, .noteGroup g,.noteGroup{  pointer-events: none}
+.note{font-size: 110px;font-family: 'Opus_Note_Names';}
+.noteGroup text{font-size: 110px;}
 #quarterFlat{ font-family:'Opus_Special' }
 .noteText{font-family: Opus_Chords !important;font-size: 25px;}
-#Flat,#Sharp{font-family: Opus_Std;font-size: 120px;}
+.flat,.sharp{font-family: Opus_Std;font-size: 120px;}
 #clefs rect { stroke:transparent; fill:transparent; cursor:pointer; }
 #clefs text {   font-family: Opus Std;font-size: 100px;pointer-events:none }
 
@@ -27,4 +26,5 @@
 .l2{stroke-width: 9.3px; opacity:0}
 .l3{stroke-width: 6.1px; pointer-events: none; stroke:black; display:none; }
 .l1,.l2,.l3{stroke:#000;fill:#000}
-.TrebleClef,.AltoClef,.BassClef,#NoteHead,#Sharp,#Flat,.notehead,.sharp,.flat{fill:#000; stroke:black; stroke-width: 2px}
+.TrebleClef,.AltoClef,.BassClef,#NoteHead,.sharp,.flat,.notehead,.sharp,.flat{fill:#000; stroke:black; stroke-width: 2px}
+

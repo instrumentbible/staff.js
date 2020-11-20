@@ -1,14 +1,16 @@
 // Staff.js
 class Staff {
-    constructor(options) {
-		
-        //console.log(options)
+	
+	constructor(options) {
 		
 		// options
         this.clef 		= options.clef			|| 'treble';
         this.accidental = options.accidental	|| 'flat';
-        this.id 		= options.id			|| 'staff';
-        
+		this.id 		= options.id			|| 'staff';
+		this.notes 		= options.notes			|| [60];
+		this.font 		= options.font			|| 'Opus';
+		this.color 		= options.color			|| '#000000';
+		this.scroll 	= options.scroll		|| false;
         
 		// and create staff SVG element
 		const newContent =  document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -17,7 +19,31 @@ class Staff {
 		document.body.appendChild(newContent);
 
 		
-        // setup notation staff
+		// TO DO: test if this.id already exist
+		
+		/*
+		 //Attempt to get the element using document.getElementById
+		 var element = document.getElementById("test");
+	  
+		 //If it isn't "undefined" and it isn't "null", then it exists.
+		 if(typeof(element) != 'undefined' && element != null){
+			 alert('Element exists!');
+		 } else{
+			 alert('Element does not exist!');
+		 }    //Attempt to get the element using document.getElementById
+		 var element = document.getElementById("test");
+
+		   //If it isn't "undefined" and it isn't "null", then it exists.
+		   if(typeof(element) != 'undefined' && element != null){
+			   alert('Element exists!');
+		   } else{
+			   alert('Element does not exist!');
+		   }
+			
+		 */
+		var thisStaff = this;
+		
+        // setup JZZ midi input
         var staffIn = JZZ.input.Kbd({
 			at: this.id,
 			keys: [
@@ -32,14 +58,19 @@ class Staff {
 				['G9', 'G9'],  ['Ab9', 'Ab9'],  ['A9', 'A9'],  ['Bb9', 'Bb9'],  ['B9', 'B9'],  ['C10','C10'], ['Db10','Db10'], ['D10','D10'], ['Eb10','Eb10'], ['E10','E10'], ['F10','F10'], ['Gb10','Gb10'],
 				['G10','G10']
 			]
-        });
+        }).connect(function(msg){
+			if (msg.isNoteOn){
+				// console.log(msg.getNote());
+				thisStaff.setNotes([msg.getNote()])
+			}
+		});
 		
 		 
 		// set the clef
 		this.setClef(this.clef);
-
-  }
+	}
     
+	// set clef (treble, alto, bass, tenor)
 	setClef(clef) {
         this.clef = clef;
 		var thisElm = this.id;
@@ -107,20 +138,134 @@ class Staff {
 		// set viewBox
 		document.getElementById(this.id).setAttribute("viewBox", viewBox);
 		
+		var theColor = this.color;
 		// hide lines
 		arr_diff(showLines, hideLines).forEach(function(key){
-			document.getElementById(thisElm).getElementById(key).style.stroke = "black";
+			document.getElementById(thisElm).getElementById(key).style.stroke = theColor;
 			document.getElementById(thisElm).getElementById(key).style.opacity = 0;
 		});
 		
 		// show lines
 		showLines.forEach(function(key){
-			document.getElementById(thisElm).getElementById(key).style.stroke = "black";
+			document.getElementById(thisElm).getElementById(key).style.stroke = theColor;
 			document.getElementById(thisElm).getElementById(key).style.opacity = 1;
 		});
 
 	}
     
+	// set note
+	setNotes(theNotes) {
+		this.notes = theNotes;
+		var thisElm = this.id;
+		
+		var dataType;
+		
+		// check if incoming value is a number
+		// or an array, else throw an error
+		try {
+			if (Array.isArray(this.notes)){
+				dataType = "array";
+			}
+			else if (typeof this.notes === 'number'){
+				dataType = "number";
+				var sdfg = this.notes;
+				this.notes = [];
+				this.notes.push(sdfg)
+			}
+			else {
+				throw "setNotes() must receive an array or integer."
+			}
+			
+		 }
+		 catch(err) {
+			 console.error(err);
+		 }
+		
+		// console.log(dataType);
+		var numberOfNotes; // total number of notes
+		
+		if (dataType === "array"){
+
+			// remove current notes
+			const removeElements = (elms) => elms.forEach(el => el.remove());
+			removeElements( document.querySelectorAll(".noteG") );
+			
+			
+			numberOfNotes = this.notes.length;
+			// for each array element....
+			for(var i = 0; i < numberOfNotes; i++){
+				var a = this.notes[i];
+
+				// create new note inside noteGroup
+				var svg = document.getElementById(thisElm).getElementsByClassName('noteGroup')[0]; //Get svg element
+				var newGroup = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+				newGroup.setAttribute("class","noteG");
+
+				var newElement = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+				newElement.setAttribute("transform","translate(125 500)");
+				newElement.setAttribute("class","note");
+				newElement.innerHTML = "a";
+				newElement.style.display = "block";
+				svg.appendChild(newGroup);
+				newGroup.appendChild(newElement);
+
+				var noteValue = a;
+				
+				// get octave
+				var octave = Math.floor((noteValue / 12) - 1);
+
+				// get pitch class (C=0, C#=1, D=2, etc)
+				var pitchClass = noteValue % 12;
+										 
+				var notePlacement = 0;
+				var accidentals = [1,3,6,8,10];
+
+				// is ACCIDENTAL
+				if (accidentals.indexOf(pitchClass) >= 0) {
+					if (this.accidental === "sharp") {
+						var newSharp = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+						newSharp.setAttribute("transform","translate(100 0)");
+						newSharp.setAttribute("class","sharp");
+						newSharp.innerHTML = "#";
+						newSharp.style.display = "block";
+						newGroup.appendChild(newSharp);
+						notePlacement = noteHeight[noteValue - 1];
+					}
+					else {
+						var newFlat = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+						newFlat.setAttribute("transform","translate(105 0)");
+						newFlat.setAttribute("class","flat");
+						newFlat.innerHTML = "b";
+						newFlat.style.display = "block";
+						newGroup.appendChild(newFlat);
+						notePlacement = noteHeight[noteValue + 1];
+					}
+				}
+										 
+				// is NATURAL
+				else {
+					notePlacement = noteHeight[noteValue];
+				}
+
+				// move note up/down
+				 if (notePlacement === undefined || notePlacement == 0) {} else {
+					newGroup.setAttribute('transform', "translate(0," + (500 + notePlacement) + ")");
+					newElement.setAttribute('transform', "translate(145," + 0 + ")");
+				 }
+				this.ledgerLines(a);
+										 
+			}
+			
+		}
+		else if (dataType === "number"){
+			numberOfNotes = 1;
+		}
+
+		// how many notes in chord?
+		//console.log(numberOfNotes)
+
+	}
+	
     
 	// get clef (returns the current clef) (ex. 'bass')
     getClef(e) {
@@ -132,26 +277,138 @@ class Staff {
 		return this.notes;
 	}
     
+	
+	/*============= Ledger Lines =============*/
+	ledgerLines(lo, hi){
+		 if(hi == null){hi = lo}
+		 
+		 var f10L = document.getElementById('f10L'), d10L = document.getElementById('d10L'), b9L = document.getElementById('b9L'), g9L = document.getElementById('g9L'), e9L = document.getElementById('e9L'), c9L = document.getElementById('c9L'), a8L = document.getElementById('a8L'), f8L = document.getElementById('f8L'), d8L = document.getElementById('d8L'), b7L = document.getElementById('b7L'), g7L = document.getElementById('g7L'), e7L = document.getElementById('e7L'), c7L = document.getElementById('c7L'), a6L = document.getElementById('a6L'), f6L = document.getElementById('f6L'), d6L = document.getElementById('d6L'), b5L = document.getElementById('b5L'), g5L = document.getElementById('g5L'), e5L = document.getElementById('e5L'), c5L = document.getElementById('c5L'), a4L = document.getElementById('a4L'), f4L = document.getElementById('f4L'), d4L = document.getElementById('d4L'), b3L = document.getElementById('b3L'), g3L = document.getElementById('g3L'), e3L = document.getElementById('e3L'), c3L = document.getElementById('c3L'), a2L = document.getElementById('a2L'), f2L = document.getElementById('f2L'), d2L = document.getElementById('d2L'), b1L = document.getElementById('b1L'), g1L = document.getElementById('g1L');
+
+		 // Grand Clef
+		 if(this.clef == 'grand') {
+			 if (hi >= 125){f10L.style.display = "block"} else                                                                                  {f10L.style.display = "none"}
+			 if (hi >= 122){d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d10L.style.display = "none"}
+			 if (hi >= 119) {b9L.style.display = "block"} else if (hi === 118 && this.accidental === "flat") {b9L.style.display = "block"} else {b9L.style.display = "none"}
+			 if (hi >= 115) {g9L.style.display = "block"} else if (hi === 114 && this.accidental === "flat") {g9L.style.display = "block"} else {g9L.style.display = "none"}
+			 if (hi >= 112) {e9L.style.display = "block"} else if (hi === 111 && this.accidental === "flat") {e9L.style.display = "block"} else {e9L.style.display = "none"}
+			 if (hi >= 108) {c9L.style.display = "block"} else                                                                                   {c9L.style.display = "none"}
+			 if (hi >= 105) {a8L.style.display = "block"} else if (hi === 104 && this.accidental === "flat") {a8L.style.display = "block"} else {a8L.style.display = "none"}
+			 if (hi >= 101) {f8L.style.display = "block"} else                                                                                   {f8L.style.display = "none"}
+			 if (hi >= 98)  {d8L.style.display = "block"} else if (hi === 97  && this.accidental === "flat") {d8L.style.display = "block"} else {d8L.style.display = "none"}
+			 if (hi >= 95)  {b7L.style.display = "block"} else if (hi === 94  && this.accidental === "flat") {b7L.style.display = "block"} else {b7L.style.display = "none"}
+			 if (hi >= 91)  {g7L.style.display = "block"} else if (hi === 90  && this.accidental === "flat") {g7L.style.display = "block"} else {g7L.style.display = "none"}
+			 if (hi >= 88)  {e7L.style.display = "block"} else if (hi === 87  && this.accidental === "flat") {e7L.style.display = "block"} else {e7L.style.display = "none"}
+			 if (hi >= 84)  {c7L.style.display = "block"} else                                                                                   {c7L.style.display = "none"}
+			 if (hi >= 81)  {a6L.style.display = "block"} else if (hi === 80  && this.accidental === "flat") {a6L.style.display = "block"} else {a6L.style.display = "none"}
+			 if(hi == 60 || lo == 60){c5L.style.display = "block"} else if(this.accidental === "flat"){if (hi === 60) {c5L.style.display = "block"} else {c5L.style.display = "none"}} else {if (hi >= 60 && lo <= 61 ) {c5L.style.display = "block"}  else {c5L.style.display = "none"}}
+			 if (lo <= 40)  {e3L.style.display = "block"} else                                                                                   {e3L.style.display = "none"}
+			 if (lo <= 36)  {c3L.style.display = "block"} else if (lo === 37  && this.accidental === "sharp")           {c3L.style.display = "block"} else {c3L.style.display = "none"}
+			 if (lo <= 33)  {a2L.style.display = "block"} else if (lo === 34  && this.accidental === "sharp")           {a2L.style.display = "block"} else {a2L.style.display = "none"}
+			 if (lo <= 29)  {f2L.style.display = "block"} else if (lo === 30  && this.accidental === "sharp")           {f2L.style.display = "block"} else {f2L.style.display = "none"}
+			 if (lo <= 26)  {d2L.style.display = "block"} else if (lo === 27  && this.accidental === "sharp")           {d2L.style.display = "block"} else {d2L.style.display = "none"}
+			 if (lo <= 23)  {b1L.style.display = "block"} else                                                                                   {b1L.style.display = "none"}
+			 if (lo <= 19)  {g1L.style.display = "block"} else if (lo === 20  && this.accidental === "sharp")           {g1L.style.display = "block"} else {g1L.style.display = "none"}
+		 }
+		 // Treble Clef
+		 if(this.clef == 'treble') {
+			 // flip note stem direction
+			  // if (hi > 71){ $('#note').html('X');} else { $('#note').html('x');  }
+			 if (hi >= 125){f10L.style.display = "block"} else                                                                                   {f10L.style.display = "none"}
+			 if (hi >= 122){d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d8L.style.display = "none"}
+			 if (hi >= 119) {b9L.style.display = "block"} else if (hi === 118 && this.accidental === "flat") {b9L.style.display = "block"} else {b9L.style.display = "none"}
+			 if (hi >= 115) {g9L.style.display = "block"} else if (hi === 114 && this.accidental === "flat") {g9L.style.display = "block"} else {g9L.style.display = "none"}
+			 if (hi >= 112) {e9L.style.display = "block"} else if (hi === 111 && this.accidental === "flat") {e9L.style.display = "block"} else {e9L.style.display = "none"}
+			 if (hi >= 108) {c9L.style.display = "block"} else                                                                                   {c9L.style.display = "none"}
+			 if (hi >= 105) {a8L.style.display = "block"} else if (hi === 104 && this.accidental === "flat") {a8L.style.display = "block"} else {a8L.style.display = "none"}
+			 if (hi >= 101) {f8L.style.display = "block"} else                                                                                   {f8L.style.display = "none"}
+			 if (hi >= 98)  {d8L.style.display = "block"} else if (hi === 97  && this.accidental === "flat") {d8L.style.display = "block"} else {d8L.style.display = "none"}
+			 if (hi >= 95)  {b7L.style.display = "block"} else if (hi === 94  && this.accidental === "flat") {b7L.style.display = "block"} else {b7L.style.display = "none"}
+			 if (hi >= 91)  {g7L.style.display = "block"} else if (hi === 90  && this.accidental === "flat") {g7L.style.display = "block"} else {g7L.style.display = "none"}
+			 if (hi >= 88)  {e7L.style.display = "block"} else if (hi === 87  && this.accidental === "flat") {e7L.style.display = "block"} else {e7L.style.display = "none"}
+			 if (hi >= 84)  {c7L.style.display = "block"} else                                                                                   {c7L.style.display = "none"}
+			 if (hi >= 81)  {a6L.style.display = "block"} else if (hi === 80  && this.accidental === "flat") {a6L.style.display = "block"} else {a6L.style.display = "none"}
+			 if (lo <= 60)  {c5L.style.display = "block"} else if (lo === 61  && this.accidental === "sharp")           {c5L.style.display = "block"} else {c5L.style.display = "none"}
+			 if (lo <= 57)  {a4L.style.display = "block"} else if (lo === 58  && this.accidental === "sharp")           {a4L.style.display = "block"} else {a4L.style.display = "none"}
+			 if (lo <= 53)  {f4L.style.display = "block"} else if (lo === 54  && this.accidental === "sharp")           {f4L.style.display = "block"} else {f4L.style.display = "none"}
+			 if (lo <= 50)  {d4L.style.display = "block"} else if (lo === 51  && this.accidental === "sharp")           {d4L.style.display = "block"} else {d4L.style.display = "none"}
+			 if (lo <= 47)  {b3L.style.display = "block"} else                                                                                   {b3L.style.display = "none"}
+			 if (lo <= 43)  {g3L.style.display = "block"} else if (lo === 44  && this.accidental === "sharp")           {g3L.style.display = "block"} else {g3L.style.display = "none"}
+			 if (lo <= 40)  {e3L.style.display = "block"} else                                                                                   {e3L.style.display = "none"}
+			 if (lo <= 36)  {c3L.style.display = "block"} else if (lo === 37  && this.accidental === "sharp")           {c3L.style.display = "block"} else {c3L.style.display = "none"}
+			 if (lo <= 33)  {a2L.style.display = "block"} else if (lo === 34  && this.accidental === "sharp")           {a2L.style.display = "block"} else {a2L.style.display = "none"}
+			 if (lo <= 29)  {f2L.style.display = "block"} else if (lo === 30  && this.accidental === "sharp")           {f2L.style.display = "block"} else {f2L.style.display = "none"}
+			 if (lo <= 26)  {d2L.style.display = "block"} else if (lo === 27  && this.accidental === "sharp")           {d2L.style.display = "block"} else {d2L.style.display = "none"}
+			 if (lo <= 23)  {b1L.style.display = "block"} else                                                                                   {b1L.style.display = "none"}
+			 if (lo <= 19)  {g1L.style.display = "block"} else if (lo === 20  && this.accidental === "sharp")           {g1L.style.display = "block"} else {g1L.style.display = "none"}
+		 }
+
+		 // Bass Clef
+		 if(this.clef == 'bass') {
+			// if (hi > 50){ $('#note').html('X');} else { $('#note').html('x');  }
+			 if (hi >= 125){f10L.style.display = "block"} else                                                                                   {f10L.style.display = "none"}
+			 if (hi >= 122){d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d8L.style.display = "none"}
+			 if (hi >= 119) {b9L.style.display = "block"} else if (hi === 118 && this.accidental === "flat") {b9L.style.display = "block"} else {b9L.style.display = "none"}
+			 if (hi >= 115) {g9L.style.display = "block"} else if (hi === 114 && this.accidental === "flat") {g9L.style.display = "block"} else {g9L.style.display = "none"}
+			 if (hi >= 112) {e9L.style.display = "block"} else if (hi === 111 && this.accidental === "flat") {e9L.style.display = "block"} else {e9L.style.display = "none"}
+			 if (hi >= 108) {c9L.style.display = "block"} else                                                                                   {c9L.style.display = "none"}
+			 if (hi >= 105) {a8L.style.display = "block"} else if (hi === 104 && this.accidental === "flat") {a8L.style.display = "block"} else {a8L.style.display = "none"}
+			 if (hi >= 101) {f8L.style.display = "block"} else                                                                                   {f8L.style.display = "none"}
+			 if (hi >= 98)  {d8L.style.display = "block"} else if (hi === 97  && this.accidental === "flat") {d8L.style.display = "block"} else {d8L.style.display = "none"}
+			 if (hi >= 95)  {b7L.style.display = "block"} else if (hi === 94  && this.accidental === "flat") {b7L.style.display = "block"} else {b7L.style.display = "none"}
+			 if (hi >= 91)  {g7L.style.display = "block"} else if (hi === 90  && this.accidental === "flat") {g7L.style.display = "block"} else {g7L.style.display = "none"}
+			 if (hi >= 88)  {e7L.style.display = "block"} else if (hi === 87  && this.accidental === "flat") {e7L.style.display = "block"} else {e7L.style.display = "none"}
+			 if (hi >= 84)  {c7L.style.display = "block"} else                                                                                   {c7L.style.display = "none"}
+			 if (hi >= 81)  {a6L.style.display = "block"} else if (hi === 80  && this.accidental === "flat") {a6L.style.display = "block"} else {a6L.style.display = "none"}
+			 if (hi >= 77)  {f6L.style.display = "block"} else                                                                                   {f6L.style.display = "none"}
+			 if (hi >= 74)  {d6L.style.display = "block"} else if (hi === 73  && this.accidental === "flat") {d6L.style.display = "block"} else {d6L.style.display = "none"}
+			 if (hi >= 71)  {b5L.style.display = "block"} else if (hi === 70  && this.accidental === "flat") {b5L.style.display = "block"} else {b5L.style.display = "none"}
+			 if (hi >= 67)  {g5L.style.display = "block"} else if (hi === 66  && this.accidental === "flat") {g5L.style.display = "block"} else {g5L.style.display = "none"}
+			 if (hi >= 64)  {e5L.style.display = "block"} else if (hi === 63  && this.accidental === "flat") {e5L.style.display = "block"} else {e5L.style.display = "none"}
+			 if (hi >= 60)  {c5L.style.display = "block"} else                                                                                   {c5L.style.display = "none"}
+			 if (lo <= 40)  {e3L.style.display = "block"} else                                                                                   {e3L.style.display = "none"}
+			 if (lo <= 36)  {c3L.style.display = "block"} else if (lo === 37  && this.accidental === "sharp")           {c3L.style.display = "block"} else {c3L.style.display = "none"}
+			 if (lo <= 33)  {a2L.style.display = "block"} else if (lo === 34  && this.accidental === "sharp")           {a2L.style.display = "block"} else {a2L.style.display = "none"}
+			 if (lo <= 29)  {f2L.style.display = "block"} else if (lo === 30  && this.accidental === "sharp")           {f2L.style.display = "block"} else {f2L.style.display = "none"}
+			 if (lo <= 26)  {d2L.style.display = "block"} else if (lo === 27  && this.accidental === "sharp")           {d2L.style.display = "block"} else {d2L.style.display = "none"}
+			 if (lo <= 23)  {b1L.style.display = "block"} else                                                                                   {b1L.style.display = "none"}
+			 if (lo <= 19)  {g1L.style.display = "block"} else if (lo === 20  && this.accidental === "sharp")           {g1L.style.display = "block"} else {g1L.style.display = "none"}
+		 }
+
+		 // Alto Clef
+		 if(this.clef == 'alto') {
+			 //if (hi > 60){ $('#note').html('X');} else { $('#note').html('x');  }
+			 if (hi >= 119) {b9L.style.display = "block"} else if (hi === 118 && this.accidental === "flat") {b9L.style.display = "block"} else {b9L.style.display = "none"}
+			 if (hi >= 115) {g9L.style.display = "block"} else if (hi === 114 && this.accidental === "flat") {g9L.style.display = "block"} else {g9L.style.display = "none"}
+			 if (hi >= 112) {e9L.style.display = "block"} else if (hi === 111 && this.accidental === "flat") {e9L.style.display = "block"} else {e9L.style.display = "none"}
+			 if (hi >= 108) {c9L.style.display = "block"} else                                                                                   {c9L.style.display = "none"}
+			 if (hi >= 105) {a8L.style.display = "block"} else if (hi === 104 && this.accidental === "flat") {a8L.style.display = "block"} else {a8L.style.display = "none"}
+			 if (hi >= 101) {f8L.style.display = "block"} else                                                                                   {f8L.style.display = "none"}
+			 if (hi >= 98)  {d8L.style.display = "block"} else if (hi === 97  && this.accidental === "flat") {d8L.style.display = "block"} else {d8L.style.display = "none"}
+			 if (hi >= 95)  {b7L.style.display = "block"} else if (hi === 94  && this.accidental === "flat") {b7L.style.display = "block"} else {b7L.style.display = "none"}
+			 if (hi >= 91)  {g7L.style.display = "block"} else if (hi === 90  && this.accidental === "flat") {g7L.style.display = "block"} else {g7L.style.display = "none"}
+			 if (hi >= 88)  {e7L.style.display = "block"} else if (hi === 87  && this.accidental === "flat") {e7L.style.display = "block"} else {e7L.style.display = "none"}
+			 if (hi >= 84)  {c7L.style.display = "block"} else                                                                                   {c7L.style.display = "none"}
+			 if (hi >= 81)  {a6L.style.display = "block"} else if (lo === 80  && this.accidental === "flat") {a6L.style.display = "block"} else {a6L.style.display = "none"}
+			 if (hi >= 77)  {f6L.style.display = "block"} else                                                                                   {f6L.style.display = "none"}
+			 if (hi >= 74)  {d6L.style.display = "block"} else if (lo === 73  && this.accidental === "flat") {d6L.style.display = "block"} else {d6L.style.display = "none"}
+			 if (hi >= 71)  {b5L.style.display = "block"} else if (lo === 70  && this.accidental === "flat") {b5L.style.display = "block"} else {b5L.style.display = "none"}
+			 if (lo <= 50)  {d4L.style.display = "block"} else if (lo === 51  && this.accidental === "sharp")           {d4L.style.display = "block"} else {d4L.style.display = "none"}
+			 if (lo <= 47)  {b3L.style.display = "block"} else                                                                                   {b3L.style.display = "none"}
+			 if (lo <= 43)  {g3L.style.display = "block"} else if (lo === 44  && this.accidental === "sharp")           {g3L.style.display = "block"} else {g3L.style.display = "none"}
+			 if (lo <= 40)  {e3L.style.display = "block"} else                                                                                   {e3L.style.display = "none"}
+			 if (lo <= 36)  {c3L.style.display = "block"} else if (lo === 37  && this.accidental === "sharp")           {c3L.style.display = "block"} else {c3L.style.display = "none"}
+			 if (lo <= 33)  {a2L.style.display = "block"} else if (lo === 34  && this.accidental === "sharp")           {a2L.style.display = "block"} else {a2L.style.display = "none"}
+			 if (lo <= 29)  {f2L.style.display = "block"} else if (lo === 30  && this.accidental === "sharp")           {f2L.style.display = "block"} else {f2L.style.display = "none"}
+			 if (lo <= 26)  {d2L.style.display = "block"} else if (lo === 27  && this.accidental === "sharp")           {d2L.style.display = "block"} else {d2L.style.display = "none"}
+			 if (lo <= 23)  {b1L.style.display = "block"} else                                                                                   {b1L.style.display = "none"}
+			 if (lo <= 19)  {g1L.style.display = "block"} else if (lo === 20  && this.accidental === "sharp")           {g1L.style.display = "block"} else {g1L.style.display = "none"}
+		 }
+	 }
+		
+	
 }
 
-/*
-
-//============= Switch Clef =============
-// parameter: grand, treble, bass, alto : string
-function clefSelect(clef) {
-    //document.getElementById('clefSelect').value = clef;
-    
-    // update tab selector
-    $(".tab-clef a").removeClass('bg-gray2-dark').css('border-right',0).css('border','solid 2px rgba(0,0,0,0.1)').children('span').css( "font-weight", "200" ).css('font-size','16px');
-    $('.tab-clef a[data-tab="' + clef + '"]').addClass('bg-gray2-dark').css('border-right','auto').css('border','solid 2px rgba(0,0,0,0.4)').find( "span" ).css( "font-weight", "600" ).css('font-size','18px');
-
-   
-    // update note
-   // handleNoteOn(noteValue);
-}
-clefSelect('treble')
-
-*/
+										 
 // get difference between two arrays
 function arr_diff (a1, a2) {
    var a = [], diff = [];
@@ -308,36 +565,40 @@ var staffSVG = `
 			<path class="l3" id="b1L" d="M 135,775 L 205, 775" />
 			<path class="l3" id="g1L" d="M 135,800 L 205, 800" />
 		</g>
-		<g id="noteGroup"    transform=" translate(0 400)">
-			<text id="note"  transform="translate(145 500)">a</text>
-			
-			<g class="accidental" transform="translate(100 500)">>
-				<text hidden id="quarterFlat"  	transform="translate(5 0)">B</text>
-				<text hidden id="quarterFlat3"  transform="translate(-10 0)">I</text>
-				<text hidden id="quarterSharp"  transform="translate(0 0)">µ</text>
-				<text hidden id="quarterSharp3" transform="translate(0 0)">˜</text>
-				<text hidden id="doubleSharp"  	transform="translate(0 0)">X</text>
-				<text hidden id="doubleFlat"  	transform="translate(-30 20)">º</text>
-				<text hidden id="natural"  		transform="translate(100 0)">§</text>
-			</g>
-			<!--<text  class="noteText noteName" fill="white"   transform="translate(160 510)">Bb</text>-->
-			<text id="Flat"  transform="translate(105 500)">b</text>
-			<text id="Sharp" transform="translate(100 500)">#</text>
-		</g>
+		<g class="noteGroup"></g>
 
-	<g id="notation"    transform=" translate(100 0)">
-		<text class="note" style="font-family: Opus_Std;"  transform="translate(0 0)">a</text>
-	</g>
 
 	<g id="clefs">
 		<rect class="trebleRect" x="3" y="325" width="70" height="190" />
 		<rect class="altoRect"   x="3" y="450" width="70" height="100" />
 		<rect class="tenorRect"  x="3" y="450" width="70" height="100" />
 		<rect class="bassRect"   x="3" y="525" width="70" height="90"  />
-		<text class="clef trebleClef" x="0" y="450" >&</text>
-		<text class="clef altoClef"   x="0" y="500" >B</text>
-		<text class="clef tenorClef"  x="0" y="500" >B</text>
+		<text class="clef trebleClef" x="0"  y="450">&</text>
+		<text class="clef altoClef"   x="0"  y="500">B</text>
+		<text class="clef tenorClef"  x="0"  y="500">B</text>
 		<text class="clef bassClef"   x="10" y="550">?</text>
 	</g>
 </g>
 `
+
+
+// vertical translation (of notehead) based on MIDI note number
+var noteHeight = {
+	19:   300,   21:   287.5, 23:   275,
+	24:   262.5, 26:   250,   28:   237.5,  29:   225,   31:   212.5, 33:   200,    35:   187.5,
+	36:   175,   38:   162.5, 40:   150,    41:   137.5, 43:   125,   45:   112.5,  47:   100,
+	48:   87.5,  50:   75,    52:   62.5,   53:   50,    55:   37.5,  57:   25,     59:   12.5,
+	60:   0.01,  62:  -12.5,  64:  -25,     65:  -37.5,  67:  -50,    69:  -62.5,   71:  -75,
+	72:  -87.5,  74:  -100 ,  76:  -112.5,  77:  -125 ,  79:  -137.5, 81:  -150,    83:  -162.5,
+	84:  -175,   86:  -187.5, 88:  -200,    89:  -212.5, 91:  -225,   93:  -237.5,  95:  -250,
+	96:  -262.5, 98:  -275,   100: -287.5,  101: -300,   103: -312.5, 105: -325,    107: -337.5,
+	108: -350,   110: -362.5, 112: -375,    113: -387.5, 115: -400,   117: -412.5,  119: -425,
+	120: -437.5, 122: -450,   124: -462.5,  125: -475,   127: -487.5,
+}
+
+
+
+// TO DO
+// support for multiple staffs
+// refactor ledger line code
+// create a addNote() function
