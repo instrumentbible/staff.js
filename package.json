@@ -2,10 +2,6 @@
   "name": "staff.js",
   "version": "1.0.0",
   "description": "A javascript library for displaying notes on a musical staff.",
-  "main": "index.js",
-  "scripts": {
-	"test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": {
 	"name": "Instrument Bible LLC",
 	"email": "contact@instrument.bible",

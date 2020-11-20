@@ -3,38 +3,41 @@
 <head>
 	
     <title>Staff.js</title>
-	<meta charset="utf-8" />
 	
-	<!-- import CSS -->
+	<!-- CSS -->
     <link rel="stylesheet" href="css/staff.css" />
 	
-	<!-- import JZZ dependencies -->
+	<!-- JavaScript -->
     <script src="js/JZZ.js"></script>
 	<script src="js/JZZ.input.Kbd.js"></script>
-	
-</head>
-<body>
-
-	<!-- import staff.js -->
 	<script src="js/staff.js"></script>
 
+</head>
+<body>
+	
+	<header>
+		<a class="button" href="https://github.com/instrumentbible/staff.js/#readme">GitHub</a>
+		<a class="button" href="https://github.com/instrumentbible/staff.js/wiki/#wiki-body">Docs</a>
+		<a  href="https://github.com/instrumentbible/staff.js#readme"><h1>staff.js 🎼</h1></a>
+	</header>
+	<div id="staffDiv" class="staff"></div>
 	<script>
 
 		// options for staff
 		var options = {
 			id: "myStaff",
+			at: "staffDiv",
 			clef: "treble",
 			accidental: "sharp",
-			color: "#000000",
-			scroll: false,
-			// viewBox: "0 440 230 260",
-			// font: "Opus"
+			color: "#000000"
 		}
 
 		// create a new staff
 		var myStaff =  new Staff(options);
 
-		myStaff.setNotes([60,66]);
-		console.log(myStaff.getNotes());
+		// set notes (C major chord)
+		myStaff.setNotes([60,64,67]);
+		//console.log(myStaff.getNotes());
+		
 	</script>
 </body>

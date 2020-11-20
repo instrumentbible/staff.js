@@ -4,19 +4,25 @@ class Staff {
 	constructor(options) {
 		
 		// options
-        this.clef 		= options.clef			|| 'treble';
-        this.accidental = options.accidental	|| 'flat';
-		this.id 		= options.id			|| 'staff';
-		this.notes 		= options.notes			|| [60];
-		this.font 		= options.font			|| 'Opus';
+		this.accidental = options.accidental	|| 'flat';
+		this.at 		= options.at			|| 'staff';
+		this.clef 		= options.clef			|| 'treble';
 		this.color 		= options.color			|| '#000000';
-		this.scroll 	= options.scroll		|| false;
-        
+		this.id 		= options.id			|| 'myStaff';
+		this.notes 		= options.notes			|| [60];
+		// this.scroll 	= options.scroll		|| false;
+		// this.font 		= options.font			|| 'Opus';
+
 		// and create staff SVG element
 		const newContent =  document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		newContent.setAttribute("id", this.id); // set ID
-		newContent.innerHTML = staffSVG; // set innerHTML
-		document.body.appendChild(newContent);
+		newContent.setAttribute("id", this.id);
+		newContent.innerHTML = staffSVG;
+		document.getElementById(this.at).appendChild(newContent);
+
+		// prevent scroll on touchmove
+		newContent.addEventListener('touchmove', function(e) {
+			e.preventDefault();
+		}, { passive: false });
 
 		
 		// TO DO: test if this.id already exist
@@ -60,12 +66,11 @@ class Staff {
 			]
         }).connect(function(msg){
 			if (msg.isNoteOn){
-				// console.log(msg.getNote());
 				thisStaff.setNotes([msg.getNote()])
 			}
+			
 		});
 		
-		 
 		// set the clef
 		this.setClef(this.clef);
 	}
@@ -90,7 +95,7 @@ class Staff {
 		
         switch(clef) {
             case "grand":
-				viewBox = "0 308 250 350";
+				viewBox = "0 320 250 360";
 				showLines = ['G3','B3','D4','F4','A4','E5','G5','B5','D6','F6'];
                 verticalHeight = 350;
 				scrollOffset   = 390;
@@ -100,7 +105,7 @@ class Staff {
 				document.getElementById(this.id).getElementsByClassName('bassRect')[0].style.display = 'block';
             break;
             case "treble":
-				viewBox = "0 290 230 260";
+				viewBox = "0 295 230 260";
 				showLines = ['E5','G5','B5','D6','F6'];
                 verticalHeight = 250;
 				scrollOffset   = 380;
@@ -108,7 +113,7 @@ class Staff {
 				document.getElementById(this.id).getElementsByClassName('trebleRect')[0].style.display = 'block';
             break;
             case "bass":
-				viewBox = "0 440 230 260";
+				viewBox = "0 445 230 260";
 				showLines = ['G3','B3','D4','F4','A4'];
                 verticalHeight = 250;
 				scrollOffset   = 510;
@@ -116,7 +121,7 @@ class Staff {
 				document.getElementById(this.id).getElementsByClassName('bassRect')[0].style.display = 'block';
             break;
             case "alto":
-				viewBox = "0 365 230 260";
+				viewBox = "0 370 230 260";
 				showLines = ['F4','A4','C5','E5','G5'];
                 verticalHeight = 250;
 				scrollOffset   = 450;
@@ -124,7 +129,7 @@ class Staff {
 				document.getElementById(this.id).getElementsByClassName('altoRect')[0].style.display = 'block';
             break;
             case "tenor":
-				viewBox = "0 390 230 260";
+				viewBox = "0 395 230 260";
 				showLines =  ['D4','F4','A4','C5','E5'];
                 verticalHeight = 250;
 				scrollOffset   = 450;
@@ -181,7 +186,6 @@ class Staff {
 			 console.error(err);
 		 }
 		
-		// console.log(dataType);
 		var numberOfNotes; // total number of notes
 		
 		if (dataType === "array"){
@@ -205,7 +209,7 @@ class Staff {
 				newElement.setAttribute("transform","translate(125 500)");
 				newElement.setAttribute("class","note");
 				newElement.innerHTML = "a";
-				newElement.style.display = "block";
+				//newElement.style.display = "block";
 				svg.appendChild(newGroup);
 				newGroup.appendChild(newElement);
 
@@ -252,7 +256,7 @@ class Staff {
 					newGroup.setAttribute('transform', "translate(0," + (500 + notePlacement) + ")");
 					newElement.setAttribute('transform', "translate(145," + 0 + ")");
 				 }
-				this.ledgerLines(a);
+				this.ledgerLines();
 										 
 			}
 			
@@ -279,15 +283,17 @@ class Staff {
     
 	
 	/*============= Ledger Lines =============*/
-	ledgerLines(lo, hi){
-		 if(hi == null){hi = lo}
-		 
-		 var f10L = document.getElementById('f10L'), d10L = document.getElementById('d10L'), b9L = document.getElementById('b9L'), g9L = document.getElementById('g9L'), e9L = document.getElementById('e9L'), c9L = document.getElementById('c9L'), a8L = document.getElementById('a8L'), f8L = document.getElementById('f8L'), d8L = document.getElementById('d8L'), b7L = document.getElementById('b7L'), g7L = document.getElementById('g7L'), e7L = document.getElementById('e7L'), c7L = document.getElementById('c7L'), a6L = document.getElementById('a6L'), f6L = document.getElementById('f6L'), d6L = document.getElementById('d6L'), b5L = document.getElementById('b5L'), g5L = document.getElementById('g5L'), e5L = document.getElementById('e5L'), c5L = document.getElementById('c5L'), a4L = document.getElementById('a4L'), f4L = document.getElementById('f4L'), d4L = document.getElementById('d4L'), b3L = document.getElementById('b3L'), g3L = document.getElementById('g3L'), e3L = document.getElementById('e3L'), c3L = document.getElementById('c3L'), a2L = document.getElementById('a2L'), f2L = document.getElementById('f2L'), d2L = document.getElementById('d2L'), b1L = document.getElementById('b1L'), g1L = document.getElementById('g1L');
+	ledgerLines(){
+		var currentNotes = this.notes;
+		var lo = arrayMin(currentNotes)
+		var hi = arrayMax(currentNotes)
+		
+		var f10L = document.getElementById('f10L'), d10L = document.getElementById('d10L'), b9L = document.getElementById('b9L'), g9L = document.getElementById('g9L'), e9L = document.getElementById('e9L'), c9L = document.getElementById('c9L'), a8L = document.getElementById('a8L'), f8L = document.getElementById('f8L'), d8L = document.getElementById('d8L'), b7L = document.getElementById('b7L'), g7L = document.getElementById('g7L'), e7L = document.getElementById('e7L'), c7L = document.getElementById('c7L'), a6L = document.getElementById('a6L'), f6L = document.getElementById('f6L'), d6L = document.getElementById('d6L'), b5L = document.getElementById('b5L'), g5L = document.getElementById('g5L'), e5L = document.getElementById('e5L'), c5L = document.getElementById('c5L'), a4L = document.getElementById('a4L'), f4L = document.getElementById('f4L'), d4L = document.getElementById('d4L'), b3L = document.getElementById('b3L'), g3L = document.getElementById('g3L'), e3L = document.getElementById('e3L'), c3L = document.getElementById('c3L'), a2L = document.getElementById('a2L'), f2L = document.getElementById('f2L'), d2L = document.getElementById('d2L'), b1L = document.getElementById('b1L'), g1L = document.getElementById('g1L');
 
 		 // Grand Clef
 		 if(this.clef == 'grand') {
-			 if (hi >= 125){f10L.style.display = "block"} else                                                                                  {f10L.style.display = "none"}
-			 if (hi >= 122){d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d10L.style.display = "none"}
+			 if (hi >= 125) {f10L.style.display = "block"} else                                                                                  {f10L.style.display = "none"}
+			 if (hi >= 122) {d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d10L.style.display = "none"}
 			 if (hi >= 119) {b9L.style.display = "block"} else if (hi === 118 && this.accidental === "flat") {b9L.style.display = "block"} else {b9L.style.display = "none"}
 			 if (hi >= 115) {g9L.style.display = "block"} else if (hi === 114 && this.accidental === "flat") {g9L.style.display = "block"} else {g9L.style.display = "none"}
 			 if (hi >= 112) {e9L.style.display = "block"} else if (hi === 111 && this.accidental === "flat") {e9L.style.display = "block"} else {e9L.style.display = "none"}
@@ -300,7 +306,7 @@ class Staff {
 			 if (hi >= 88)  {e7L.style.display = "block"} else if (hi === 87  && this.accidental === "flat") {e7L.style.display = "block"} else {e7L.style.display = "none"}
 			 if (hi >= 84)  {c7L.style.display = "block"} else                                                                                   {c7L.style.display = "none"}
 			 if (hi >= 81)  {a6L.style.display = "block"} else if (hi === 80  && this.accidental === "flat") {a6L.style.display = "block"} else {a6L.style.display = "none"}
-			 if(hi == 60 || lo == 60){c5L.style.display = "block"} else if(this.accidental === "flat"){if (hi === 60) {c5L.style.display = "block"} else {c5L.style.display = "none"}} else {if (hi >= 60 && lo <= 61 ) {c5L.style.display = "block"}  else {c5L.style.display = "none"}}
+			 if (hi == 60 || lo == 60){c5L.style.display = "block"} else if(this.accidental === "flat"){if (hi === 60) {c5L.style.display = "block"} else {c5L.style.display = "none"}} else {if (hi >= 60 && lo <= 61 ) {c5L.style.display = "block"}  else {c5L.style.display = "none"}}
 			 if (lo <= 40)  {e3L.style.display = "block"} else                                                                                   {e3L.style.display = "none"}
 			 if (lo <= 36)  {c3L.style.display = "block"} else if (lo === 37  && this.accidental === "sharp")           {c3L.style.display = "block"} else {c3L.style.display = "none"}
 			 if (lo <= 33)  {a2L.style.display = "block"} else if (lo === 34  && this.accidental === "sharp")           {a2L.style.display = "block"} else {a2L.style.display = "none"}
@@ -314,7 +320,7 @@ class Staff {
 			 // flip note stem direction
 			  // if (hi > 71){ $('#note').html('X');} else { $('#note').html('x');  }
 			 if (hi >= 125){f10L.style.display = "block"} else                                                                                   {f10L.style.display = "none"}
-			 if (hi >= 122){d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d8L.style.display = "none"}
+			 if (hi >= 122){d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d10L.style.display = "none"}
 			 if (hi >= 119) {b9L.style.display = "block"} else if (hi === 118 && this.accidental === "flat") {b9L.style.display = "block"} else {b9L.style.display = "none"}
 			 if (hi >= 115) {g9L.style.display = "block"} else if (hi === 114 && this.accidental === "flat") {g9L.style.display = "block"} else {g9L.style.display = "none"}
 			 if (hi >= 112) {e9L.style.display = "block"} else if (hi === 111 && this.accidental === "flat") {e9L.style.display = "block"} else {e9L.style.display = "none"}
@@ -346,7 +352,7 @@ class Staff {
 		 if(this.clef == 'bass') {
 			// if (hi > 50){ $('#note').html('X');} else { $('#note').html('x');  }
 			 if (hi >= 125){f10L.style.display = "block"} else                                                                                   {f10L.style.display = "none"}
-			 if (hi >= 122){d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d8L.style.display = "none"}
+			 if (hi >= 122){d10L.style.display = "block"} else if (hi === 121 && this.accidental === "flat") {d10L.style.display = "block"}else {d10L.style.display = "none"}
 			 if (hi >= 119) {b9L.style.display = "block"} else if (hi === 118 && this.accidental === "flat") {b9L.style.display = "block"} else {b9L.style.display = "none"}
 			 if (hi >= 115) {g9L.style.display = "block"} else if (hi === 114 && this.accidental === "flat") {g9L.style.display = "block"} else {g9L.style.display = "none"}
 			 if (hi >= 112) {e9L.style.display = "block"} else if (hi === 111 && this.accidental === "flat") {e9L.style.display = "block"} else {e9L.style.display = "none"}
@@ -421,7 +427,7 @@ function arr_diff (a1, a2) {
 
 // this is the innerHTML for the staff
 var staffSVG = `
-	<g transform="translate(0 -1.5)">
+	<g>
 		<path class="l1" id="G10" d="M 0,  12.5   L 10000,  12.5"  />
 		<path class="l1" id="Gb10"d="M 0,  18.75  L 10000,  18.75" />
 		<path class="l2" id="F10" d="M 0,  25     L 10000,  25"    />
@@ -531,39 +537,39 @@ var staffSVG = `
 		<path class="l1" id="A1"  d="M 0,  787.5  L 10000,  787.5" />
 		<path class="l1" id="Ab1" d="M 0,  793.75 L 10000,  793.75"/>
 		<path class="l1" id="G1"  d="M 0,  800    L 10000,  800"   />
-		<g id="ledgerLines">
-			<path class="l3" id="f10L"d="M 135,25  L 205, 25"  />
-			<path class="l3" id="d10L"d="M 135,50  L 205, 50"  />
-			<path class="l3" id="b9L" d="M 135,75  L 205, 75"  />
-			<path class="l3" id="g9L" d="M 135,100 L 205, 100" />
-			<path class="l3" id="e9L" d="M 135,125 L 205, 125" />
-			<path class="l3" id="c9L" d="M 135,150 L 205, 150" />
-			<path class="l3" id="a8L" d="M 135,175 L 205, 175" />
-			<path class="l3" id="f8L" d="M 135,200 L 205, 200" />
-			<path class="l3" id="d8L" d="M 135,225 L 205, 225" />
-			<path class="l3" id="b7L" d="M 135,250 L 205, 250" />
-			<path class="l3" id="g7L" d="M 135,275 L 205, 275" />
-			<path class="l3" id="e7L" d="M 135,300 L 205, 300" />
-			<path class="l3" id="c7L" d="M 135,325 L 205, 325" />
-			<path class="l3" id="a6L" d="M 135,350 L 205, 350" />
-			<path class="l3" id="f6L" d="M 135,375 L 205, 375" />
-			<path class="l3" id="d6L" d="M 135,400 L 205, 400" />
-			<path class="l3" id="b5L" d="M 135,425 L 205, 425" />
-			<path class="l3" id="g5L" d="M 135,450 L 205, 450" />
-			<path class="l3" id="e5L" d="M 135,475 L 205, 475" />
-			<path class="l3" id="c5L" d="M 135,500 L 205, 500" />
-			<path class="l3" id="a4L" d="M 135,525 L 205, 525" />
-			<path class="l3" id="f4L" d="M 135,550 L 205, 550" />
-			<path class="l3" id="d4L" d="M 135,575 L 205, 575" />
-			<path class="l3" id="b3L" d="M 135,600 L 205, 600" />
-			<path class="l3" id="g3L" d="M 135,625 L 205, 625" />
-			<path class="l3" id="e3L" d="M 135,650 L 205, 650" />
-			<path class="l3" id="c3L" d="M 135,675 L 205, 675" />
-			<path class="l3" id="a2L" d="M 135,700 L 205, 700" />
-			<path class="l3" id="f2L" d="M 135,725 L 205, 725" />
-			<path class="l3" id="d2L" d="M 135,750 L 205, 750" />
-			<path class="l3" id="b1L" d="M 135,775 L 205, 775" />
-			<path class="l3" id="g1L" d="M 135,800 L 205, 800" />
+		<g class="ledgerLines">
+			<path id="f10L" d="M 135,25  L 205, 25"  />
+			<path id="d10L" d="M 135,50  L 205, 50"  />
+			<path id="b9L" d="M 135,75  L 205, 75"  />
+			<path id="g9L" d="M 135,100 L 205, 100" />
+			<path id="e9L" d="M 135,125 L 205, 125" />
+			<path id="c9L" d="M 135,150 L 205, 150" />
+			<path id="a8L" d="M 135,175 L 205, 175" />
+			<path id="f8L" d="M 135,200 L 205, 200" />
+			<path id="d8L" d="M 135,225 L 205, 225" />
+			<path id="b7L" d="M 135,250 L 205, 250" />
+			<path id="g7L" d="M 135,275 L 205, 275" />
+			<path id="e7L" d="M 135,300 L 205, 300" />
+			<path id="c7L" d="M 135,325 L 205, 325" />
+			<path id="a6L" d="M 135,350 L 205, 350" />
+			<path id="f6L" d="M 135,375 L 205, 375" />
+			<path id="d6L" d="M 135,400 L 205, 400" />
+			<path id="b5L" d="M 135,425 L 205, 425" />
+			<path id="g5L" d="M 135,450 L 205, 450" />
+			<path id="e5L" d="M 135,475 L 205, 475" />
+			<path id="c5L" d="M 135,500 L 205, 500" />
+			<path id="a4L" d="M 135,525 L 205, 525" />
+			<path id="f4L" d="M 135,550 L 205, 550" />
+			<path id="d4L" d="M 135,575 L 205, 575" />
+			<path id="b3L" d="M 135,600 L 205, 600" />
+			<path id="g3L" d="M 135,625 L 205, 625" />
+			<path id="e3L" d="M 135,650 L 205, 650" />
+			<path id="c3L" d="M 135,675 L 205, 675" />
+			<path id="a2L" d="M 135,700 L 205, 700" />
+			<path id="f2L" d="M 135,725 L 205, 725" />
+			<path id="d2L" d="M 135,750 L 205, 750" />
+			<path id="b1L" d="M 135,775 L 205, 775" />
+			<path id="g1L" d="M 135,800 L 205, 800" />
 		</g>
 		<g class="noteGroup"></g>
 
@@ -597,8 +603,12 @@ var noteHeight = {
 }
 
 
+									 
+// get min/max of array
+function arrayMin(arr) {
+  return arr.reduce(function (p, v) { return ( p < v ? p : v ); });
+}
 
-// TO DO
-// support for multiple staffs
-// refactor ledger line code
-// create a addNote() function
+function arrayMax(arr) {
+  return arr.reduce(function (p, v) { return ( p > v ? p : v ); });
+}

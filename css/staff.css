@@ -1,30 +1,151 @@
+html, body{
+	position: absolute;
+	margin-left: 0;
+}
+
 /* ========== FONTS ========== */
 
-/* Opus */
-@font-face { font-family: 'Opus_Std';           src: url('../fonts/Opus/Opus.otf');  }
-@font-face { font-family: 'Opus_Metronome';     src: url('../fonts/Opus/Opus Metronome.otf');  }
-@font-face { font-family: 'Opus_Chords';        src: url('../fonts/Opus/Opus Chords Sans.otf');  }
-@font-face { font-family: 'Opus_Text';        src: url('../fonts/Opus/Opus Text.otf');  }
-@font-face { font-family: 'Opus_Plain_Chords';  src: url('../fonts/Opus/Opus PlainChords.otf');  }
-@font-face { font-family: 'Opus_Script';        src: url('../fonts/Opus/Opus Chords Sans.otf');  }
-@font-face { font-family: 'Opus_Note_Names';    src: url('../fonts/Opus/Opus Note Names.otf');  }
-@font-face { font-family: 'Opus_Special';       src: url('../fonts/Opus/Opus Special.otf');  }
+@font-face { font-family: 'Opus_Std';        src: url('../fonts/Opus/Opus.otf');  				}
+@font-face { font-family: 'Opus_Metronome';  src: url('../fonts/Opus/Opus Metronome.otf');  	}
+@font-face { font-family: 'Opus_Chords';     src: url('../fonts/Opus/Opus Chords Sans.otf');  	}
+@font-face { font-family: 'Opus_Text';       src: url('../fonts/Opus/Opus Text.otf');  			}
+@font-face { font-family: 'Opus_Note_Names'; src: url('../fonts/Opus/Opus Note Names.otf');  	}
+@font-face { font-family: 'Opus_Special';    src: url('../fonts/Opus/Opus Special.otf');  		}
 
 /* ========== Staff ========== */
-#staffDiv{max-height: 100vh;margin: 0 auto;text-align: center;/* height: 100%; */margin: 0 !important; width: 100% !important; border-radius: 5px!important;}
-#svgStaff {box-sizing: border-box; min-height:100%; max-width: 100%; height: -webkit-fill-available; cursor:pointer !important; }
-.noteGroup path, .noteGroup g,.noteGroup{  pointer-events: none}
-.note{font-size: 110px;font-family: 'Opus_Note_Names';}
-.noteGroup text{font-size: 110px;}
-#quarterFlat{ font-family:'Opus_Special' }
-.noteText{font-family: Opus_Chords !important;font-size: 25px;}
-.flat,.sharp{font-family: Opus_Std;font-size: 120px;}
-#clefs rect { stroke:transparent; fill:transparent; cursor:pointer; }
-#clefs text {   font-family: Opus Std;font-size: 100px;pointer-events:none }
+#svgStaff {
+	box-sizing: border-box;
+	min-height:100%;
+	max-width: 100%;
+	height: -webkit-fill-available;
+	cursor:pointer !important;
+}
 
-.l1{stroke-width: 6.1px; opacity:0}
-.l2{stroke-width: 9.3px; opacity:0}
-.l3{stroke-width: 6.1px; pointer-events: none; stroke:black; display:none; }
-.l1,.l2,.l3{stroke:#000;fill:#000}
-.TrebleClef,.AltoClef,.BassClef,#NoteHead,.sharp,.flat,.notehead,.sharp,.flat{fill:#000; stroke:black; stroke-width: 2px}
+.noteGroup path, .noteGroup g,.noteGroup{
+	pointer-events: none;
+}
 
+.note{
+	font-size: 110px;
+	font-family: 'Opus_Note_Names';
+}
+
+.noteGroup text{
+	font-size: 110px;
+}
+
+#quarterFlat{
+	font-family:'Opus_Special';
+}
+
+.noteText{
+	font-family: 'Opus_Chords' !important;
+	font-size: 25px;
+}
+
+.flat, .sharp{
+	font-family: 'Opus_Std';
+	font-size: 120px;
+}
+
+#clefs rect {
+	stroke:transparent;
+	fill:transparent;
+	cursor:pointer;
+}
+
+#clefs text {
+	font-family: 'Opus_Std';
+	font-size: 100px;
+	pointer-events:none;
+}
+
+.l1{
+	stroke-width: 6.1px;
+	opacity:0;
+}
+
+.l2{
+	stroke-width: 9.3px;
+	opacity:0;
+}
+
+.ledgerLines path{
+	stroke-width: 6.1px;
+	pointer-events: none;
+	stroke:black;
+	display:none;
+}
+
+.l1,.l2,.ledgerLines path{
+	stroke:#000;
+	fill:#000;
+}
+
+.TrebleClef,.AltoClef,.BassClef,#NoteHead,.sharp,.flat,.notehead,.sharp,.flat{
+	fill:#000;
+	stroke:black;
+	stroke-width: 2px;
+}
+
+#myStaff {
+	height: 100%;
+	max-height: min(100%,100vw);
+	position:absolute;
+	left: 50%;
+	top: 50%;
+	transform: translateX(-50%) translateY(-50%);
+}
+
+.staff {
+	height: max(100%, 100vh);
+	width: 100vw;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+svg {
+	user-select: none;
+}
+
+h1 {
+	text-align: center;
+	font: max(40px,min(80px,5vh)) Helvetica;
+	font-weight: 100;
+	position: absolute;
+	width: 100%;
+	text-decoration: none;
+	color: black;
+	white-space:nowrap;
+	top:0;
+	margin-top:2vh
+}
+
+.button {
+	font:  max(25px,min(2vh,3em)) Helvetica;
+	text-decoration: none;
+	background-color: #EEEEEE;
+	color: #333333;
+	padding: 2px 6px 2px 6px;
+	border: 2px solid #CCCCCC;
+	/*border-right: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	border-left: 1px solid #CCCCCC;*/
+	border-radius:10px;
+	right: 2em;
+	top: 2em;
+	cursor:pointer;
+}
+
+.button:hover{
+ background-color: #8f8f8f;
+ color:white
+}
+header{
+	cursor:default;
+	z-index: 2;
+	position:fixed;
+	width:100vw;
+	padding-left: 0.5em;
+}
