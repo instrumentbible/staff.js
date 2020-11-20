@@ -1,0 +1,28 @@
+{
+  "name": "staff.js",
+  "version": "1.0.0",
+  "description": "A javascript library for displaying notes on a musical staff.",
+  "main": "index.js",
+  "scripts": {
+	"test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+	"name": "Instrument Bible LLC",
+	"email": "contact@instrument.bible",
+	"url": "https://instrument.bible"
+  },
+  "license": "MIT",
+  "repository": {
+	"type": "git",
+	"url": "https://github.com/instrumentbible/staff.js"
+  },
+  "bugs": {
+	"url": "https://github.com/instrumentbible/staff.js/issues"
+  },
+  "homepage": "https://github.com/instrumentbible/staff.js#readme",
+  "keywords": [
+	"music",
+	"notation",
+	"clef"
+  ]
+}

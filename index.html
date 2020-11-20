@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	
+    <title>Staff.js</title>
+	<meta charset="utf-8" />
+	
+	<!-- import CSS -->
+    <link rel="stylesheet" href="css/staff.css" />
+	
+	<!-- import JS dependencies -->
+    <script src="js/jquery.js"></script>
+    <script src="js/JZZ.js"></script>
+	<script src="js/JZZ.input.Kbd.js"></script>
+	
+</head>
+<body>
+    
+    <div id="svg-object" ></div>
+	<div id="demo"></div>
+	<script src="js/staff.js"></script>
+
+<script>
+
+	// options for staff
+	var options = {
+		id: "myStaff",
+		clef: "bass",
+		accidental: "flat",
+		color: "#FF0000",
+		scroll: false,
+		// viewBox: "0 440 230 260",
+		// font: "Opus"
+
+	}
+
+	// create a new staff
+	var myStaff =  new Staff(options)
+
+	// let myStaff = new Staff(options);
+	// document.getElementById("demo").innerHTML = "My staff clef <br>" + myStaff.clef;
+	// document.getElementById("demo").innerHTML += "My staff clef  <br>" + myStaff.clef;
+
+
+</script>
+</body>
