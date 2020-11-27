@@ -10,7 +10,10 @@
   "license": "MIT",
   "repository": {
 	"type": "git",
-	"url": "https://github.com/instrumentbible/staff.js"
+	"url": "git+https://github.com/instrumentbible/staff.js.git"
+  },
+  "publishConfig": {
+	"registry":"https://npm.pkg.github.com"
   },
   "bugs": {
 	"url": "https://github.com/instrumentbible/staff.js/issues"
