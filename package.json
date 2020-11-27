@@ -1,6 +1,6 @@
 {
   "name": "@instrumentbible/staff.js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A javascript library for displaying notes on a musical staff.",
   "author": {
 	"name": "Instrument Bible LLC",
