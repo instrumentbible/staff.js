@@ -1,9 +1,8 @@
 # staff.js 🎼
 
 A javascript library for displaying notes on a musical staff.
-Inspired by the `nslider` in MaxMSP.
 
-> DISCLAIMER: this library is a work in progress
+> Inspired by the `nslider` in MaxMSP.
 
 Try the [live demo](https://instrumentbible.github.io/staff.js/).
 
@@ -44,15 +43,6 @@ var options = {
 var myStaff = new Staff(options)
 ```
 
-```js
-// create a new staff
-var myStaff = new Staff({
-	clef:"treble",
-	accidental:"flat"
-})
-```
-
-
 
 ## clef
 change the clef
@@ -92,11 +82,6 @@ To display multiple notes, `setNote()` with an array.
 
 ```js
 myStaff.setNote([45,55,62]);
-```
-OR
-```js
-var chord = [45,55,62];
-myStaff.setNote(chord);
 ```
 
 ### Color
