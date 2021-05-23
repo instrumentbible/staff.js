@@ -117,4 +117,4 @@ Please write to [contact@instrument.bible](mailto://contact@instrument.bible) or
 [![YouTube](https://img.shields.io/static/v1?label=&message=Youtube&logo=youtube&logoColor=white&color=FF5555)](https://youtube.com/channel/UCkw7klLsjYXYGzFT-9a3WMA) 
 [![Facebook](https://img.shields.io/static/v1?label=&message=Facebook&logo=facebook&logoColor=white&color=1877F2)](https://facebook.com/instrumentbible) 
 [![LinkedIn](https://img.shields.io/static/v1?label=&message=LinkedIn&logo=LinkedIn&logoColor=white&color=0077B5)](https://linkedin.com/company/instrumentbible) 
-[![Instagram](https://img.shields.io/static/v1?label=&message=Instagram&logo=Instagram&logoColor=white&color=E4405F)](https://instagram.com/instrumentbible)
+[![Instagram](https://img.shields.io/static/v1?label=&message=Instagram&logo=Instagram&logoColor=white&color=E4405F)](https://instagram.com/instrument.bible)
