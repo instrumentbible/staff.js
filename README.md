@@ -110,7 +110,7 @@ myStaff.getColor();
 
 
 # Questions?   
-Please write to [contact@instrument.bible](mailto://contact@instrument.bible) or visit [instrument.bible](https://instrument.bible).
+Please write to [contact@instrument.bible](mailto:contact@instrument.bible) or visit [instrument.bible](https://instrument.bible).
   
 [![Discord](https://img.shields.io/static/v1?label=&message=Discord%20&logo=discord&logoColor=white&color=7289da)](https://discord.gg/VJDj7nt) 
 [![Twitter](https://img.shields.io/static/v1?label=&message=Twitter&logo=Twitter&logoColor=white&color=1DA1F2)](https://twitter.com/instrumentbible) 
